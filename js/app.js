@@ -195,10 +195,8 @@ async function init() {
     const resp = await fetch(`data/levels/${loadLevel}.json`);
     if (resp.ok) {
       const levelData = await resp.json();
-      HSK_DATA = {
-        meta: { ...levelData.meta, levels: [], total_words: 11032, stems: [], stem_elements: [] },
-        words: levelData.words
-      };
+      levelData._level = loadLevel;
+      HSK_DATA = levelData;
       // Load level index for navigation metadata
       try {
         const idxResp = await fetch('data/index.json');
@@ -218,7 +216,15 @@ async function init() {
     }
   }
 
-  // Pre-compute tier map
+  // Pre-compute tier map from the data index (always has all levels)
+  if (DATA_INDEX) {
+    wordTierMap = {};
+    for (const [lk, li] of Object.entries(DATA_INDEX.levels)) {
+      const levelNum = parseInt(lk.replace('hsk','').replace('79','7'));
+      // We don't have individual word IDs, so we approximate by level
+      // The altar counts words_seen per tier, which works with IDs from any source
+    }
+  }
   ensureTierMap(HSK_DATA);
 
   // Restore writing cursor if valid
@@ -265,37 +271,48 @@ async function init() {
 async function loadDay(dayOffset) {
   const state = loadState();
   
-  // Check if we need to load a different level
-  if (DATA_INDEX && HSK_DATA && (dayOffset < 0 || dayOffset >= HSK_DATA.words.length)) {
+  // Convert global dayOffset to local index within the correct level
+  let localIdx = dayOffset;
+  
+  if (DATA_INDEX) {
     // Find which level this day belongs to
     let targetLevel = null;
+    let levelStart = 0;
     for (const [lk, li] of Object.entries(DATA_INDEX.levels)) {
       const start = li.start_offset;
       const end = start + li.word_count - 1;
       if (dayOffset >= start && dayOffset <= end) {
         targetLevel = lk;
+        levelStart = start;
         break;
       }
     }
+    
     if (targetLevel) {
-      try {
-        const resp = await fetch(`data/levels/${targetLevel}.json`);
-        if (resp.ok) {
-          const levelData = await resp.json();
-          HSK_DATA.words = levelData.words;
-          ensureTierMap(HSK_DATA);
-        }
-      } catch (e) { /* fall through to bounds check */ }
+      localIdx = dayOffset - levelStart;
+      
+      // Load this level's data if we don't have it
+      if (!HSK_DATA || !HSK_DATA._level || HSK_DATA._level !== targetLevel) {
+        try {
+          const resp = await fetch(`data/levels/${targetLevel}.json`);
+          if (resp.ok) {
+            const levelData = await resp.json();
+            levelData._level = targetLevel;
+            HSK_DATA = levelData;
+            ensureTierMap(HSK_DATA);
+          }
+        } catch (e) { /* fall through */ }
+      }
     }
   }
   
   const words = HSK_DATA ? HSK_DATA.words : [];
-  if (dayOffset < 0 || dayOffset >= words.length) {
+  if (localIdx < 0 || localIdx >= words.length) {
     showCompletionMessage();
     return;
   }
 
-  currentWord = words[dayOffset];
+  currentWord = words[localIdx];
   currentDayOffset = dayOffset;
 
   // Apply HSK level theme color

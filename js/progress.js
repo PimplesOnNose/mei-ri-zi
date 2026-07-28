@@ -350,9 +350,12 @@ let wordTierMap = null;
 function ensureTierMap(hskDaily) {
   if (wordTierMap) return;
   wordTierMap = {};
-  for (const word of hskDaily.words) {
+  const words = hskDaily.words || [];
+  for (const word of words) {
     wordTierMap[word.id] = levelToTier(word.hsk_level || 1);
   }
+  // Also support deriving tier from word ID prefix for levels not yet loaded
+  // This allows the altar to count words from ALL levels, not just the current one
 }
 
 function getAltarState(wordsSeen) {
@@ -367,7 +370,14 @@ function getAltarState(wordsSeen) {
 
   // Count seen words per tier
   for (const wordId of wordsSeen) {
-    const tier = wordTierMap ? wordTierMap[wordId] : null;
+    let tier = wordTierMap ? wordTierMap[wordId] : null;
+    // If not in map (word from a level not yet loaded), derive from ID prefix
+    if (!tier) {
+      const prefix = wordId.replace(/_.*$/, '');
+      const tierMap = { hsk1: 'wood', hsk2: 'wood', hsk3: 'fire', hsk4: 'fire',
+                        hsk5: 'earth', hsk6: 'metal', hsk79: 'water' };
+      tier = tierMap[prefix] || null;
+    }
     if (tier && tiers[tier]) {
       tiers[tier].seen += 1;
     }
