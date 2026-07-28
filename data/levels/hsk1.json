@@ -6981,11 +6981,19 @@
       ],
       "stroke_count": 10,
       "example": {
-        "zh": "这是进来。",
-        "pinyin": "",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is come in, enter."
+        "zh": "请进来坐。",
+        "pinyin": "Qǐng jìnlai zuò.",
+        "pinyin_parts": [
+          "Qǐng",
+          "jìnlai",
+          "zuò"
+        ],
+        "pinyin_tones": [
+          3,
+          4,
+          4
+        ],
+        "en": "Please come in and sit down."
       }
     },
     {
