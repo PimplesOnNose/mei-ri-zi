@@ -7616,11 +7616,27 @@
       ],
       "stroke_count": 10,
       "example": {
-        "zh": "这是一个国际学校。",
-        "pinyin": "Zhè shì yí ge guójì xuéxiào.",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is an international school."
+        "zh": "她在一家国际公司工作。",
+        "pinyin": "Tā zài yī jiā guójì gōngsī gōngzuò.",
+        "pinyin_parts": [
+          "Tā",
+          "zài",
+          "yī",
+          "jiā",
+          "guójì",
+          "gōngsī",
+          "gōngzuò"
+        ],
+        "pinyin_tones": [
+          1,
+          4,
+          1,
+          1,
+          2,
+          1,
+          4
+        ],
+        "en": "She works at an international company."
       }
     },
     {
@@ -9032,11 +9048,31 @@
       ],
       "stroke_count": 10,
       "example": {
-        "zh": "这是一个好机会。",
-        "pinyin": "Zhè shì yí ge hǎo jīhui.",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is a good opportunity."
+        "zh": "这是一个学习中文的好机会。",
+        "pinyin": "Zhè shì yī gè xuéxí Zhōngwén de hǎo jīhuì.",
+        "pinyin_parts": [
+          "Zhè",
+          "shì",
+          "yī",
+          "gè",
+          "xuéxí",
+          "Zhōngwén",
+          "de",
+          "hǎo",
+          "jīhuì"
+        ],
+        "pinyin_tones": [
+          4,
+          4,
+          1,
+          4,
+          2,
+          1,
+          0,
+          3,
+          4
+        ],
+        "en": "This is a good opportunity to learn Chinese."
       }
     },
     {
@@ -15048,11 +15084,25 @@
       ],
       "stroke_count": 10,
       "example": {
-        "zh": "这是一个普通的杯子。",
-        "pinyin": "zhè shì yí ge pǔtōng de bēizi.",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is an ordinary cup."
+        "zh": "这件衣服样子很普通。",
+        "pinyin": "Zhè jiàn yīfu yàngzi hěn pǔtōng.",
+        "pinyin_parts": [
+          "Zhè",
+          "jiàn",
+          "yīfu",
+          "yàngzi",
+          "hěn",
+          "pǔtōng"
+        ],
+        "pinyin_tones": [
+          4,
+          4,
+          1,
+          4,
+          3,
+          3
+        ],
+        "en": "This piece of clothing looks very ordinary."
       }
     },
     {
@@ -17094,11 +17144,25 @@
       ],
       "stroke_count": 10,
       "example": {
-        "zh": "这是实际的情况。",
-        "pinyin": "Zhè shì shíjì de qíngkuàng.",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is the actual situation."
+        "zh": "实际情况不是这样的。",
+        "pinyin": "Shíjì qíngkuàng bù shì zhèyàng de.",
+        "pinyin_parts": [
+          "Shíjì",
+          "qíngkuàng",
+          "bù",
+          "shì",
+          "zhèyàng",
+          "de"
+        ],
+        "pinyin_tones": [
+          2,
+          2,
+          4,
+          4,
+          4,
+          0
+        ],
+        "en": "The actual situation is not like this."
       }
     },
     {
@@ -20130,11 +20194,27 @@
       ],
       "stroke_count": 5,
       "example": {
-        "zh": "这位是我的老师。",
-        "pinyin": "zhè wèi shì wǒ de lǎo shī",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is my teacher."
+        "zh": "这位是我的汉语老师。",
+        "pinyin": "Zhè wèi shì wǒ de Hànyǔ lǎoshī.",
+        "pinyin_parts": [
+          "Zhè",
+          "wèi",
+          "shì",
+          "wǒ",
+          "de",
+          "Hànyǔ",
+          "lǎoshī"
+        ],
+        "pinyin_tones": [
+          4,
+          4,
+          4,
+          3,
+          0,
+          4,
+          3
+        ],
+        "en": "This is my Chinese teacher."
       }
     },
     {

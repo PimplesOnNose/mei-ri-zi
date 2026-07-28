@@ -27002,11 +27002,29 @@
       ],
       "stroke_count": 5,
       "example": {
-        "zh": "这是一首优美的诗歌。",
-        "pinyin": "Zhè shì yī shǒu yōuměi de shīgē.",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is a beautiful poem."
+        "zh": "这是他写的一首诗。",
+        "pinyin": "Zhè shì tā xiě de yī shǒu shī.",
+        "pinyin_parts": [
+          "Zhè",
+          "shì",
+          "tā",
+          "xiě",
+          "de",
+          "yī",
+          "shǒu",
+          "shī"
+        ],
+        "pinyin_tones": [
+          4,
+          4,
+          1,
+          3,
+          0,
+          1,
+          3,
+          1
+        ],
+        "en": "This is a poem he wrote."
       }
     },
     {

@@ -3577,11 +3577,25 @@
       ],
       "stroke_count": 10,
       "example": {
-        "zh": "这只是初步的计划。",
-        "pinyin": "Zhè zhǐ shì chūbù de jìhuà.",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is just a preliminary plan."
+        "zh": "这是我们初步的想法。",
+        "pinyin": "Zhè shì wǒmen chūbù de xiǎngfǎ.",
+        "pinyin_parts": [
+          "Zhè",
+          "shì",
+          "wǒmen",
+          "chūbù",
+          "de",
+          "xiǎngfǎ"
+        ],
+        "pinyin_tones": [
+          4,
+          4,
+          3,
+          1,
+          0,
+          3
+        ],
+        "en": "This is our initial idea."
       }
     },
     {
@@ -5815,11 +5829,25 @@
       ],
       "stroke_count": 10,
       "example": {
-        "zh": "这只是短期的计划。",
-        "pinyin": "Zhè zhǐ shì duǎnqī de jìhuà.",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is just a short-term plan."
+        "zh": "这只是短期的安排。",
+        "pinyin": "Zhè zhǐ shì duǎnqī de ānpái.",
+        "pinyin_parts": [
+          "Zhè",
+          "zhǐ",
+          "shì",
+          "duǎnqī",
+          "de",
+          "ānpái"
+        ],
+        "pinyin_tones": [
+          4,
+          3,
+          4,
+          3,
+          0,
+          1
+        ],
+        "en": "This is only a short-term arrangement."
       }
     },
     {
@@ -6215,11 +6243,21 @@
       ],
       "stroke_count": 10,
       "example": {
-        "zh": "这是一个很有用的发明。",
-        "pinyin": "Zhè shì yī gè hěn yǒuyòng de fāmíng.",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is a very useful invention."
+        "zh": "中国发明了造纸术。",
+        "pinyin": "Zhōngguó fāmíng le zàozhǐshù.",
+        "pinyin_parts": [
+          "Zhōngguó",
+          "fāmíng",
+          "le",
+          "zàozhǐshù"
+        ],
+        "pinyin_tones": [
+          1,
+          1,
+          0,
+          4
+        ],
+        "en": "China invented papermaking."
       }
     },
     {
@@ -13756,11 +13794,21 @@
       ],
       "stroke_count": 10,
       "example": {
-        "zh": "这是一件很紧急的事情。",
-        "pinyin": "Zhè shì yī jiàn hěn jǐnjí de shìqing.",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is a very urgent matter."
+        "zh": "现在情况很紧急。",
+        "pinyin": "Xiànzài qíngkuàng hěn jǐnjí.",
+        "pinyin_parts": [
+          "Xiànzài",
+          "qíngkuàng",
+          "hěn",
+          "jǐnjí"
+        ],
+        "pinyin_tones": [
+          4,
+          2,
+          3,
+          3
+        ],
+        "en": "The situation is very urgent now."
       }
     },
     {
@@ -17599,11 +17647,23 @@
       ],
       "stroke_count": 10,
       "example": {
-        "zh": "这是一个民间故事。",
-        "pinyin": "Zhè shì yī gè mínjiān gùshì.",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is a folk tale."
+        "zh": "他很喜欢民间音乐。",
+        "pinyin": "Tā hěn xǐhuān mínjiān yīnyuè.",
+        "pinyin_parts": [
+          "Tā",
+          "hěn",
+          "xǐhuān",
+          "mínjiān",
+          "yīnyuè"
+        ],
+        "pinyin_tones": [
+          1,
+          3,
+          3,
+          2,
+          4
+        ],
+        "en": "He really likes folk music."
       }
     },
     {
@@ -24818,11 +24878,29 @@
       ],
       "stroke_count": 5,
       "example": {
-        "zh": "这就是我所知道的。",
-        "pinyin": "Zhè jiù shì wǒ suǒ zhīdào de.",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is what I know."
+        "zh": "这就是我所知道的一切。",
+        "pinyin": "Zhè jiù shì wǒ suǒ zhīdào de yīqiè.",
+        "pinyin_parts": [
+          "Zhè",
+          "jiù",
+          "shì",
+          "wǒ",
+          "suǒ",
+          "zhīdào",
+          "de",
+          "yīqiè"
+        ],
+        "pinyin_tones": [
+          4,
+          4,
+          4,
+          3,
+          3,
+          1,
+          0,
+          4
+        ],
+        "en": "This is everything that I know."
       }
     },
     {
@@ -27779,11 +27857,27 @@
       ],
       "stroke_count": 10,
       "example": {
-        "zh": "这是一台先进的机器。",
-        "pinyin": "Zhè shì yī tái xiānjìn de jīqì.",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is an advanced machine."
+        "zh": "这家公司的技术很先进。",
+        "pinyin": "Zhè jiā gōngsī de jìshù hěn xiānjìn.",
+        "pinyin_parts": [
+          "Zhè",
+          "jiā",
+          "gōngsī",
+          "de",
+          "jìshù",
+          "hěn",
+          "xiānjìn"
+        ],
+        "pinyin_tones": [
+          4,
+          1,
+          1,
+          0,
+          4,
+          3,
+          4
+        ],
+        "en": "This company's technology is very advanced."
       }
     },
     {
@@ -28179,11 +28273,31 @@
       ],
       "stroke_count": 10,
       "example": {
-        "zh": "这是一个奇怪的现象。",
-        "pinyin": "Zhè shì yī gè qíguài de xiànxiàng.",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is a strange phenomenon."
+        "zh": "这是一个很有趣的自然现象。",
+        "pinyin": "Zhè shì yī gè hěn yǒuqù de zìrán xiànxiàng.",
+        "pinyin_parts": [
+          "Zhè",
+          "shì",
+          "yī",
+          "gè",
+          "hěn",
+          "yǒuqù",
+          "de",
+          "zìrán",
+          "xiànxiàng"
+        ],
+        "pinyin_tones": [
+          4,
+          4,
+          1,
+          4,
+          3,
+          4,
+          0,
+          4,
+          4
+        ],
+        "en": "This is a very interesting natural phenomenon."
       }
     },
     {
@@ -28787,11 +28901,23 @@
       ],
       "stroke_count": 10,
       "example": {
-        "zh": "这只是形式问题。",
-        "pinyin": "Zhè zhǐ shì xíngshì wèntí.",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is just a question of form."
+        "zh": "形势对我们很有利。",
+        "pinyin": "Xíngshì duì wǒmen hěn yǒulì.",
+        "pinyin_parts": [
+          "Xíngshì",
+          "duì",
+          "wǒmen",
+          "hěn",
+          "yǒulì"
+        ],
+        "pinyin_tones": [
+          2,
+          4,
+          3,
+          3,
+          4
+        ],
+        "en": "The situation is very favorable for us."
       }
     },
     {
@@ -33431,11 +33557,23 @@
       ],
       "stroke_count": 10,
       "example": {
-        "zh": "这是一个重大的决定。",
-        "pinyin": "Zhè shì yī gè zhòngdà de juédìng.",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is a major decision."
+        "zh": "这件事意义重大。",
+        "pinyin": "Zhè jiàn shì yìyì zhòngdà.",
+        "pinyin_parts": [
+          "Zhè",
+          "jiàn",
+          "shì",
+          "yìyì",
+          "zhòngdà"
+        ],
+        "pinyin_tones": [
+          4,
+          4,
+          4,
+          4,
+          4
+        ],
+        "en": "This matter is of great significance."
       }
     },
     {
@@ -34679,11 +34817,27 @@
       ],
       "stroke_count": 10,
       "example": {
-        "zh": "这是他写的文学作品。",
-        "pinyin": "Zhè shì tā xiě de wénxué zuòpǐn.",
-        "pinyin_parts": [],
-        "pinyin_tones": [],
-        "en": "This is a literary work written by him."
+        "zh": "这是他最著名的作品。",
+        "pinyin": "Zhè shì tā zuì zhùmíng de zuòpǐn.",
+        "pinyin_parts": [
+          "Zhè",
+          "shì",
+          "tā",
+          "zuì",
+          "zhùmíng",
+          "de",
+          "zuòpǐn"
+        ],
+        "pinyin_tones": [
+          4,
+          4,
+          1,
+          4,
+          4,
+          0,
+          3
+        ],
+        "en": "This is his most famous work."
       }
     },
     {
