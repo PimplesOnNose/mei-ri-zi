@@ -144,7 +144,7 @@ mei-ri-zi/
 HSK 3.0 vocabulary lists sourced from [krmanik/HSK-3.0](https://github.com/krmanik/HSK-3.0) — 
 11,032 words across all 7 HSK levels. Every word has AI-generated example sentences 
 (DeepSeek), radical/glyph breakdowns for all characters, and Edge TTS audio (晓晓) 
-for HSK 1-6.
+for all HSK levels.
 
 ## License
 
