@@ -1304,7 +1304,9 @@ function showOnboarding() {
       state.learner.start_offset = offset;
       state.onboarding_completed = true;  // mark so we don't loop
       state.created_at = new Date().toISOString();  // reset timer
-      saveState();
+      // Flush synchronously — don't rely on debounced save() + beforeunload
+      // because iOS Safari may not fire beforeunload before location.reload()
+      saveStateInternal(stateCache);
     }
     c.overlay.hidden = true;
     c.btn.onclick = null;
