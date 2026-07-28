@@ -64,24 +64,56 @@ the five directions: green East, red South, yellow Center, white West, black Nor
 
 ## Features
 
-### MVP (v1)
+### Daily Learning
 
-- **One word per day** — auto-advancing by personal local date
+- **One word per day** — auto-advancing by personal local date; timeline is yours alone
 - **Daily 识写习 loop** — Card (识) → Writing (写) → Review (习), flowing as a single ritual
-- **Tone-colored pinyin** — rendered in five Wu Xing colors
+- **Tone-colored pinyin** — rendered in five Wu Xing colors for visual tone intuition
 - **Hanzi-writer practice** — 米字格 rice-grid canvas with Animate/Trace/Reveal modes
 - **SM-2 spaced repetition** — words auto-enrolled on first view; 会了/需要再背 adjusts intervals
 - **Edge TTS audio** — zh-CN-XiaoxiaoNeural (晓晓) voice, slowed 5% for learners
+
+### Progress & Tracking
+
 - **Heavenly-stem cycle counter** — 60-day 甲子 cycle replaces the linear streak
-- **Seasonal atmosphere** — background shifts subtly with the 24 solar terms (节气)
 - **Five-Colored Earth mastery bar** — shows element-tier completion at a glance
-- **One-tap backup** — JSON export/import, sync URL with base64-gzipped state
+- **Seasonal atmosphere** — background shifts subtly with the 24 solar terms (节气)
+- **Weekly vitamin pack review** — every 7 days, review the past week's words
+- **Missed-day catch-up** — gentle 补上/跳过 flow for skipped days
+
+### Tone Practice (NEW!)
+
+- **Microphone-based tone contour practice** — speak into your mic and see your pitch
+  visualized in real time on an SVG grid, compared against the expected tone contour
+- Supports all five tones (一声 high-level, 二声 rising, 三声 falling-rising, 四声 falling, 轻声 neutral)
+- Per-character practice for multi-syllable words
+
+### Export & Share
+
+- **One-tap backup** — JSON export/import for full progress
+- **Sync URL** — base64-gzipped state in the URL fragment; bookmark it, scan it, email it
+- **Share card as image** — export today's word card as a PNG
+- **Printable practice sheet** — opens a formatted A4 page with 米字格 grids for paper handwriting
+- **甲子 celebration report** — printable one-pager showing cycle stats, altar progress, and memorable words
+
+### Search & Review
+
+- **Search** — across all vocabulary by Chinese, pinyin, or English, filtered by HSK level
+- **Favorites** — save and browse favorite words
+- **Quiz mode** — character→meaning and meaning→character quizzes with SRS feedback
+
+### Platform
+
+- **PWA installable** — add to home screen for near-native experience
+- **Service Worker** — full offline support for core app and cached vocabulary
+- **Keyboard shortcuts** — ← → navigation, space for audio, s for save, / for search, t for tone practice, and more
 
 ## Tech Stack
 
 - **Static site** — plain HTML + CSS + JS, no build step, no server
 - **Wu Xing design system** — scholar's ink-night palette with named traditional pigments
 - **Hanzi-writer** — stroke animation and tracing for writing practice
+- **Web Audio API** — real-time pitch detection for tone practice
 - **localStorage** — all progress lives on device (~5KB per learner)
 - **Edge TTS** — free neural TTS via Python `edge-tts` library
 
@@ -104,6 +136,12 @@ open http://localhost:8080
 ```bash
 pip install edge-tts
 python3 scripts/generate_audio.py
+```
+
+### Downloading Stroke Data (Optional — enables fully offline writing practice)
+
+```bash
+python3 scripts/download_stroke_data.py
 ```
 
 ### Regenerating Vocabulary Data
@@ -129,13 +167,18 @@ mei-ri-zi/
 │   └── celebrations.js     # Yellow Dragon & Four Symbols guardian SVGs
 ├── data/
 │   ├── hsk_daily.json      # Master word list (11,032 words)
+│   ├── levels/             # Per-level vocabulary files
+│   ├── char_strokes/       # Local hanzi-writer stroke data (run script)
 │   └── _cache/             # Cached downloads
 ├── audio/
 │   ├── index.json          # Audio path map
 │   └── word_audio/         # Generated MP3 files
 ├── scripts/
-│   ├── generate_data.py    # Build vocabulary from HSK 3.0 data
-│   └── generate_audio.py   # Edge TTS audio generation
+│   ├── generate_data.py      # Build vocabulary from HSK 3.0 data
+│   ├── generate_audio.py     # Edge TTS audio generation
+│   └── download_stroke_data.py  # Download hanzi-writer stroke data
+├── sw.js                   # Service Worker for offline support
+├── manifest.json           # PWA manifest
 └── start.sh                # Dev server launcher
 ```
 
