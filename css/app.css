@@ -461,6 +461,11 @@ body::before {
   align-items: center;
   margin-bottom: var(--space-md);
 }
+.card-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
 .day-label {
   font-family: var(--font-ui);
   font-size: 12px;
@@ -468,6 +473,10 @@ body::before {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+.btn-share {
+  font-size: 16px !important;
+}
+.btn-share:disabled { opacity: 0.4; }
 .fav-btn {
   background: none;
   border: none;
@@ -589,6 +598,20 @@ body::before {
   font-style: italic;
   margin-top: var(--space-xs);
 }
+.btn-reveal-tiny {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--fg-soft);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: var(--space-sm);
+  min-height: 36px;
+  transition: all var(--duration-fast);
+}
+.btn-reveal-tiny:hover { color: var(--theme-accent, var(--accent-gold)); border-color: var(--theme-accent, var(--accent-gold)); }
 
 .btn-play-sentence {
   margin-top: var(--space-sm);
@@ -1463,6 +1486,30 @@ body::before {
   width: 120px;
   height: 120px;
   margin: 0 auto var(--space-md);
+  animation: guardian-reveal 1.2s var(--ease-out);
+}
+.celebration-svg svg {
+  animation: guardian-breathe 3s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes guardian-reveal {
+  0% { opacity: 0; transform: scale(0.8); }
+  50% { opacity: 0.5; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes guardian-breathe {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.03); }
+}
+
+/* Ink-wash draw-on for guardian strokes */
+.celebration-svg svg g {
+  stroke-dasharray: 800;
+  stroke-dashoffset: 800;
+  animation: ink-draw 1.5s ease-out forwards;
+}
+@keyframes ink-draw {
+  to { stroke-dashoffset: 0; }
 }
 .celebration-title {
   font-family: var(--font-display-zh);
@@ -1527,6 +1574,162 @@ body::before {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--bg-surface); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--fg-soft); }
+
+/* ---- Toast Notification ---- */
+#toast-notification {
+  position: fixed;
+  bottom: calc(var(--altar-height) + var(--space-lg));
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--theme-accent, var(--accent-gold));
+  border-radius: 10px;
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--fg);
+  z-index: 300;
+  animation: toast-in 0.3s var(--ease-out);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  white-space: nowrap;
+}
+#toast-notification .toast-zh { margin-right: 6px; }
+#toast-notification .toast-en {
+  font-size: 11px;
+  color: var(--fg-dim);
+}
+#toast-notification.toast-hide {
+  animation: toast-out 0.3s var(--ease-out) forwards;
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes toast-out {
+  from { opacity: 1; }
+  to { opacity: 0; transform: translateX(-50%) translateY(10px); }
+}
+
+/* ---- Weekly Review ---- */
+.modal-weekly-review { max-width: 480px; }
+.week-label {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--theme-accent, var(--accent-gold));
+}
+.weekly-review-words {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 50vh;
+  overflow-y: auto;
+  margin: var(--space-md) 0;
+}
+.week-word {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border-radius: 8px;
+  cursor: pointer;
+  background: var(--bg-surface);
+  border: 1px solid transparent;
+  transition: all var(--duration-fast);
+  min-height: 44px;
+}
+.week-word:hover {
+  border-color: var(--theme-accent, var(--accent-gold));
+  background: var(--theme-accent-soft, var(--accent-gold-soft));
+}
+.week-word .ww-char {
+  font-family: var(--font-display-zh);
+  font-size: 18px;
+  min-width: 50px;
+}
+.week-word .ww-pinyin {
+  font-family: var(--font-pinyin);
+  font-size: 13px;
+  font-style: italic;
+  color: var(--fg-dim);
+  flex: 1;
+}
+.week-word .ww-english {
+  font-family: var(--font-body-en);
+  font-size: 14px;
+  color: var(--fg-dim);
+}
+.weekly-review-actions {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-md);
+}
+
+/* ---- Tone Practice Modal ---- */
+.modal-tone { max-width: 400px; }
+.tone-char-display {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--fg-dim);
+}
+.tone-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+.tone-visualizer {
+  width: 100%;
+  max-width: 300px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: var(--space-sm);
+}
+.tone-visualizer svg {
+  width: 100%;
+  height: auto;
+}
+.tone-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+}
+.tone-word-display {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+.tone-word-char {
+  font-family: var(--font-display-zh);
+  font-size: 36px;
+  color: var(--fg);
+}
+.tone-word-pinyin {
+  font-family: var(--font-pinyin);
+  font-size: 16px;
+  font-style: italic;
+  color: var(--fg-dim);
+}
+.tone-buttons {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.tone-result {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  text-align: center;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: 8px;
+  width: 100%;
+}
+.tone-result.good { color: var(--correct); background: rgba(80,250,123,0.1); }
+.tone-result.keep-practicing { color: var(--theme-accent, var(--accent-gold)); background: var(--accent-gold-soft); }
+.tone-result.neutral { color: var(--fg-dim); }
 
 /* ---- Temperature-based seasonal atmosphere ---- */
 body.temp-0 { --bg-tint: hsl(220, 15%, 4%); }

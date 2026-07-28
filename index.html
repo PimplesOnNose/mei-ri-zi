@@ -25,7 +25,9 @@
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <!-- pako for sync URL compression -->
 <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
-<link rel="stylesheet" href="css/app.css?v=1.7">
+<!-- html2canvas for share-card image export -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<link rel="stylesheet" href="css/app.css?v=1.8">
 </head>
 <body>
 <!-- Loading overlay -->
@@ -55,6 +57,7 @@
     </div>
     <div class="header-right">
       <button class="btn-icon btn-search" id="btn-search" aria-label="搜索 Search" title="搜索 /">⌕</button>
+      <button class="btn-icon btn-tone" id="btn-tone-header" aria-label="声调练习 Tone Practice" title="声调练习 🎤">🎤</button>
       <button class="btn-icon btn-quiz" id="btn-quiz-header" aria-label="测验 Quiz" title="测验 ?">?</button>
       <button class="btn-icon btn-favorites" id="btn-favorites" aria-label="收藏 Saved words" title="收藏 ☆">☆</button>
       <button class="btn-icon btn-settings" id="btn-settings" aria-label="设置 Settings" title="设置 ⚙">⚙</button>
@@ -96,7 +99,10 @@
       <div class="card card-accent" id="daily-card">
         <header class="card-header">
           <span class="day-label" id="day-label">—</span>
-          <button class="fav-btn" id="fav-btn" aria-label="Save word">☆</button>
+          <div class="card-header-actions">
+            <button class="btn-icon btn-share" id="btn-share" aria-label="Share card" title="分享 Share">↗</button>
+            <button class="fav-btn" id="fav-btn" aria-label="Save word">☆</button>
+          </div>
         </header>
         <div class="card-body" id="card-body">
           <!-- word character -->
@@ -166,6 +172,7 @@
         <div class="writing-nav">
           <button class="btn btn-char-prev" id="btn-char-prev" disabled>← 上一字</button>
           <button class="btn btn-char-next" id="btn-char-next">下一字 →</button>
+          <button class="btn btn-print" id="btn-print-sheet" title="打印练习页">🖨 打印</button>
         </div>
       </div>
       <div class="phase-actions">
@@ -196,6 +203,7 @@
         <div class="stamp-text">今日完成</div>
         <div class="stamp-streak" id="stamp-streak">连续 0 天</div>
         <div class="stamp-stem" id="stamp-stem">甲子 cycle: 0/60</div>
+        <button class="btn btn-jiazi-sheet" id="btn-jiazi-sheet" hidden>🖨 甲子报告 · Print Report</button>
       </div>
     </section>
 
@@ -249,6 +257,51 @@
         <button class="filter-btn active" data-level="all">All</button>
       </div>
       <div class="search-results" id="search-results"></div>
+    </div>
+  </div>
+
+  <!-- Tone Practice Modal -->
+  <div class="modal-overlay" id="tone-modal" hidden>
+    <div class="modal modal-tone">
+      <div class="modal-header">
+        <h2>🎤 声调练习 · Tone Practice</h2>
+        <div class="tone-char-display" id="tone-char-display"></div>
+        <button class="btn-close-modal" aria-label="Close tone practice">✕</button>
+      </div>
+      <div class="tone-body">
+        <div class="tone-visualizer" id="tone-visualizer">
+          <svg width="300" height="160" viewBox="0 0 300 160" id="tone-svg">
+            <!-- Grid lines -->
+            <line x1="0" y1="0" x2="300" y2="0" stroke="#2a2a4a" stroke-width="0.5"/>
+            <line x1="0" y1="40" x2="300" y2="40" stroke="#2a2a4a" stroke-width="0.5"/>
+            <line x1="0" y1="80" x2="300" y2="80" stroke="#2a2a4a" stroke-width="0.5"/>
+            <line x1="0" y1="120" x2="300" y2="120" stroke="#2a2a4a" stroke-width="0.5"/>
+            <line x1="0" y1="160" x2="300" y2="160" stroke="#2a2a4a" stroke-width="0.5"/>
+            <!-- Tone labels -->
+            <text x="5" y="14" fill="#666" font-size="10" font-family="Inter,sans-serif">5</text>
+            <text x="5" y="54" fill="#666" font-size="10" font-family="Inter,sans-serif">4</text>
+            <text x="5" y="94" fill="#666" font-size="10" font-family="Inter,sans-serif">3</text>
+            <text x="5" y="134" fill="#666" font-size="10" font-family="Inter,sans-serif">2</text>
+            <text x="5" y="156" fill="#666" font-size="10" font-family="Inter,sans-serif">1</text>
+            <!-- Target tone path -->
+            <path id="tone-target" d="" fill="none" stroke-width="2" stroke-dasharray="4,3" opacity="0.5"/>
+            <!-- User pitch path -->
+            <path id="tone-user" d="" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="tone-controls">
+          <div class="tone-word-display">
+            <span class="tone-word-char" id="tone-word-char" lang="zh-CN"></span>
+            <span class="tone-word-pinyin" id="tone-word-pinyin"></span>
+          </div>
+          <div class="tone-buttons">
+            <button class="btn btn-primary" id="btn-tone-start">🎤 开始录音 Start</button>
+            <button class="btn" id="btn-tone-stop" disabled>⏹ 停止 Stop</button>
+            <button class="btn" id="btn-tone-next">下一字 →</button>
+          </div>
+          <div class="tone-result" id="tone-result" hidden></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -332,9 +385,24 @@
           </select>
         </label>
         <hr class="settings-divider">
-        <button class="btn btn-settings-action" id="btn-backup">备份 · Backup</button>
-        <button class="btn btn-settings-action" id="btn-restore">恢复 · Restore</button>
-        <button class="btn btn-settings-action" id="btn-sync-url">链接同步 · Sync URL</button>
+        <button class="btn btn-settings-action" id="btn-install-pwa" hidden>📲 安装 App · Install</button>
+        <button class="btn btn-settings-action" id="btn-backup">💾 备份 · Backup</button>
+        <button class="btn btn-settings-action" id="btn-restore">📂 恢复 · Restore</button>
+        <button class="btn btn-settings-action" id="btn-sync-url">🔗 链接同步 · Sync URL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weekly Review Modal -->
+  <div class="modal-overlay" id="weekly-review-modal" hidden>
+    <div class="modal modal-weekly-review">
+      <div class="modal-header">
+        <h2>📅 周回顾 · Weekly Review</h2>
+        <span class="week-label" id="week-label">Week 1</span>
+      </div>
+      <div class="weekly-review-words" id="weekly-review-words"></div>
+      <div class="weekly-review-actions">
+        <button class="btn btn-primary" id="btn-weekly-done">✓ 完成 Done</button>
       </div>
     </div>
   </div>
@@ -350,10 +418,10 @@
   </div>
 </div>
 
-<script src="js/srs.js?v=1.7"></script>
-<script src="js/progress.js?v=1.7"></script>
-<script src="js/celebrations.js?v=1.7"></script>
-<script src="js/app.js?v=1.7"></script>
+<script src="js/srs.js?v=1.8"></script>
+<script src="js/progress.js?v=1.8"></script>
+<script src="js/celebrations.js?v=1.8"></script>
+<script src="js/app.js?v=1.8"></script>
 <script>
 // Register service worker for offline support
 if ('serviceWorker' in navigator) {

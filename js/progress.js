@@ -192,14 +192,14 @@ function saveStateInternal(state) {
   }
 }
 
-/* Debounced save for rapid interactions */
+/* Debounced save for rapid interactions — 30s delay + flush on beforeunload */
 let saveTimer = null;
 function saveState() {
   if (saveTimer) clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     if (stateCache) saveStateInternal(stateCache);
     saveTimer = null;
-  }, 300);
+  }, 30000);
 }
 
 /* Flush on beforeunload — wired in app.js */

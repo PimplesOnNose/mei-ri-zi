@@ -24,6 +24,7 @@ const dom = {
   solarTerm:      $('solar-term'),
   dayLabel:       $('day-label'),
   favBtn:         $('fav-btn'),
+  btnShare:       $('btn-share'),
   wordChar:       $('word-char'),
   wordPinyin:     $('word-pinyin'),
   wordMeta:       $('word-meta'),
@@ -71,6 +72,7 @@ const dom = {
   btnShow:        $('btn-show'),
   btnCharPrev:    $('btn-char-prev'),
   btnCharNext:    $('btn-char-next'),
+  btnPrintSheet:  $('btn-print-sheet'),
   btnXieContinue: $('btn-xie-continue'),
   btnXieSkip:     $('btn-xie-skip'),
 
@@ -100,6 +102,7 @@ const dom = {
   favoritesModal: $('favorites-modal'),
   favoritesList:  $('favorites-list'),
   settingsModal:  $('settings-modal'),
+  btnToneHeader:  $('btn-tone-header'),
   btnQuizHeader:  $('btn-quiz-header'),
   btnSearch:      $('btn-search'),
   btnFavorites:   $('btn-favorites'),
@@ -125,6 +128,7 @@ const dom = {
   settingAudioSpeed:    $('setting-audio-speed'),
   settingLanguage:      $('setting-language'),
   settingStartLevel:    $('setting-start-level'),
+  btnInstallPwa:  $('btn-install-pwa'),
   btnBackup:      $('btn-backup'),
   btnRestore:     $('btn-restore'),
   btnSyncUrl:     $('btn-sync-url'),
@@ -413,11 +417,31 @@ function renderCard(word) {
   dom.wordMeta.innerHTML = posHtml + enHtml;
 
   // Example sentence
+  const state = loadState();
+  const revealTranslation = state.settings.reveal_translation === true;
   if (word.example && word.example.zh) {
     dom.exampleSection.hidden = false;
     dom.exampleZh.textContent = word.example.zh;
     dom.examplePinyin.innerHTML = renderToneColoredPinyin(word.example.pinyin_parts, word.example.pinyin_tones);
     dom.exampleEn.textContent = `"${word.example.en || ''}"`;
+    dom.exampleEn.style.display = revealTranslation ? 'block' : 'none';
+    // Add reveal button if translation is hidden
+    let revealBtn = document.getElementById('reveal-translation-btn');
+    if (!revealBtn) {
+      revealBtn = document.createElement('button');
+      revealBtn.id = 'reveal-translation-btn';
+      revealBtn.className = 'btn-reveal-tiny';
+      revealBtn.textContent = '显示翻译 Show translation';
+      revealBtn.addEventListener('click', function() {
+        const en = document.getElementById('example-en');
+        if (en) {
+          en.style.display = 'block';
+          this.style.display = 'none';
+        }
+      });
+      dom.exampleSection.querySelector('.section-body').appendChild(revealBtn);
+    }
+    revealBtn.style.display = revealTranslation ? 'none' : 'inline-block';
   } else {
     dom.exampleSection.hidden = true;
   }
@@ -674,7 +698,13 @@ function initHanziWriter(char, hskLevel) {
       highlightColor: '#50fa7b',
       showHintAfterMisses: 3,
       charDataLoader: function(ch, onComplete, onError) {
-        HanziWriter.loadCharacterData(ch).then(onComplete).catch(onError);
+        // Try local stroke data first, fall back to CDN
+        fetch('data/char_strokes/' + encodeURIComponent(ch) + '.json')
+          .then(r => r.ok ? r.json() : Promise.reject('not found'))
+          .then(data => onComplete(data))
+          .catch(() => {
+            HanziWriter.loadCharacterData(ch).then(onComplete).catch(onError);
+          });
       }
     });
   } catch (e) {
@@ -762,6 +792,134 @@ function onCharPrev() {
     state.writing_cursor = { word_id: currentWord.id, char_idx: currentCharIdx };
     saveState();
     initWritingPhase();
+  }
+}
+
+/* ---- Printable practice sheet ---- */
+function openPrintSheet() {
+  if (!currentWord) return;
+  
+  const w = currentWord;
+  const chars = [...w.word];
+  const gridSize = 120;
+  const grids = chars.map((ch, i) => `
+    <div class="print-grid-wrap">
+      <svg width="${gridSize}" height="${gridSize}" xmlns="http://www.w3.org/2000/svg">
+        <rect width="${gridSize}" height="${gridSize}" fill="none" stroke="#ccc" stroke-width="1"/>
+        <line x1="${gridSize/2}" y1="0" x2="${gridSize/2}" y2="${gridSize}" stroke="#ddd" stroke-width="0.5"/>
+        <line x1="0" y1="${gridSize/2}" x2="${gridSize}" y2="${gridSize/2}" stroke="#ddd" stroke-width="0.5"/>
+        <line x1="0" y1="0" x2="${gridSize}" y2="${gridSize}" stroke="#ddd" stroke-width="0.5"/>
+        <line x1="${gridSize}" y1="0" x2="0" y2="${gridSize}" stroke="#ddd" stroke-width="0.5"/>
+        <text x="${gridSize/2}" y="${gridSize/2 + 12}" text-anchor="middle"
+          font-family="'Ma Shan Zheng','Noto Serif SC',serif" font-size="40" fill="#999">${escHtml(ch)}</text>
+      </svg>
+      <div class="print-pinyin">${w.pinyin_parts ? w.pinyin_parts[i] || '' : ''}</div>
+    </div>
+  `).join('');
+  
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>每日字练习 · ${escHtml(w.word)}</title>
+<style>
+  @page { margin: 20mm; }
+  body { font-family: 'Noto Serif SC', 'Ma Shan Zheng', serif; color: #333; }
+  h1 { font-size: 28px; text-align: center; margin-bottom: 4px; }
+  .sub { text-align: center; color: #666; font-size: 14px; margin-bottom: 20px; }
+  .meta { text-align: center; color: #888; font-size: 13px; margin-bottom: 16px; }
+  .grids { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .print-grid-wrap { text-align: center; }
+  .print-grid-wrap svg { border: 1px solid #eee; border-radius: 4px; }
+  .print-pinyin { font-size: 13px; color: #666; margin-top: 4px; font-style: italic; }
+  .example { margin-top: 24px; text-align: center; font-size: 16px; color: #555; line-height: 1.8; }
+  .example-en { font-size: 14px; color: #888; font-style: italic; }
+  .footer { margin-top: 30px; text-align: center; font-size: 11px; color: #aaa; }
+  @media print { body { padding: 0; } }
+</style></head><body>
+  <h1>${escHtml(w.word)}</h1>
+  <div class="sub">${escHtml(w.pinyin_text || '')}</div>
+  <div class="meta">${w.pos ? escHtml(w.pos) + ' · ' : ''}${w.english ? '"' + escHtml(w.english) + '"' : ''} · HSK ${w.hsk_level}</div>
+  <div class="grids">${grids}</div>
+  <div class="example">${w.example ? escHtml(w.example.zh) + '<br><div class="example-en">' + escHtml(w.example.en || '') + '</div>' : ''}</div>
+  <div class="footer">每日字 · ${getLocalDate()} · Day ${currentDayOffset + 1}</div>
+  <script>window.onload = function() { window.print(); }<\/script>
+</body></html>`;
+  
+  const win = window.open('', '_blank');
+  if (win) {
+    win.document.write(html);
+    win.document.close();
+  }
+}
+
+/* ---- 甲子 celebration printable report ---- */
+function openJiaziSheet() {
+  const state = loadState();
+  const dayOffset = getDayOffset(state);
+  const cycleNum = state.progress.completed_jiazi_cycles || 0;
+  const wordsSeen = state.progress.words_seen.length;
+  const altar = getAltarState(state.progress.words_seen);
+  
+  // Pick memorable words (favorites first, then random)
+  const favWords = state.favorites || [];
+  const sampleWords = favWords.slice(0, 6).map(id => {
+    // Try to find in current HSK_DATA
+    if (HSK_DATA) return HSK_DATA.words.find(w => w.id === id);
+    return null;
+  }).filter(Boolean);
+  
+  const sampleHtml = sampleWords.map(w =>
+    `<span style="font-family:'Ma Shan Zheng','Noto Serif SC',serif;font-size:24px;margin:0 8px;">${escHtml(w.word)}</span>`
+  ).join('') || '<span style="color:#999;">—</span>';
+  
+  // Altar bar
+  const altarBands = ['wood','fire','earth','metal','water'].map(t => {
+    const data = altar[t];
+    const pct = data && data.total > 0 ? Math.round((data.seen / data.total) * 100) : 0;
+    const colors = { wood: '#4a9e8a', fire: '#c4452d', earth: '#c9a96e', metal: '#8faacc', water: '#3a6e8e' };
+    return `<div style="flex:1;height:12px;background:#eee;border-radius:6px;overflow:hidden;">
+      <div style="width:${pct}%;height:100%;background:${colors[t]};border-radius:6px;"></div>
+    </div>`;
+  }).join('');
+  
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>每日字 · 甲子报告 #${cycleNum}</title>
+<style>
+  @page { margin: 15mm; size: A4; }
+  body { font-family: 'Noto Serif SC', Georgia, serif; color: #333; padding: 20px; }
+  h1 { font-size: 26px; text-align: center; margin-bottom: 4px; }
+  .sub { text-align: center; color: #666; font-size: 13px; margin-bottom: 20px; }
+  .stamp { text-align: center; font-size: 48px; color: #c9a96e; margin: 10px 0; }
+  .stats { display: flex; justify-content: center; gap: 20px; margin: 16px 0; flex-wrap: wrap; }
+  .stat-box { text-align: center; padding: 10px 16px; border: 1px solid #ddd; border-radius: 8px; min-width: 80px; }
+  .stat-num { font-size: 22px; font-weight: 700; }
+  .stat-label { font-size: 11px; color: #888; }
+  .altar { display: flex; gap: 6px; margin: 20px 0; }
+  .samples { text-align: center; margin: 20px 0; padding: 16px; border: 1px solid #eee; border-radius: 8px; }
+  .samples-label { font-size: 12px; color: #888; margin-bottom: 8px; }
+  .footer { margin-top: 30px; text-align: center; font-size: 10px; color: #aaa; }
+</style></head><body>
+  <div class="stamp">🐉</div>
+  <h1>甲子 #${cycleNum} · 完成</h1>
+  <div class="sub">Completed ${getLocalDate()} · ${dayOffset + 1} days of practice</div>
+  <div class="stats">
+    <div class="stat-box"><div class="stat-num">${dayOffset + 1}</div><div class="stat-label">天 Days</div></div>
+    <div class="stat-box"><div class="stat-num">${wordsSeen}</div><div class="stat-label">字 Words</div></div>
+    <div class="stat-box"><div class="stat-num">${cycleNum}</div><div class="stat-label">甲子 Cycles</div></div>
+  </div>
+  <div class="altar">${altarBands}</div>
+  <div class="samples">
+    <div class="samples-label">Memorable Characters</div>
+    <div>${sampleHtml}</div>
+  </div>
+  <div class="footer">每日字 · Měi Rì Zì · ${getLocalDate()}</div>
+  <script>window.onload = function() { window.print(); }<\/script>
+</body></html>`;
+  
+  const win = window.open('', '_blank');
+  if (win) {
+    win.document.write(html);
+    win.document.close();
   }
 }
 
@@ -898,6 +1056,25 @@ function showCompletion() {
 
   dom.stampStreak.textContent = `连续 ${streak.current_streak} 天`;
   dom.stampStem.textContent = `甲子 cycle: ${(dayOffset + 1) % 60 || 60}/60`;
+  
+  // Show 甲子 report button on completion days
+  const jiaziBtn = document.getElementById('btn-jiazi-sheet');
+  if (jiaziBtn) {
+    jiaziBtn.hidden = (dayOffset + 1) % 60 !== 0;
+  }
+
+  // Check for weekly review (every 7 days)
+  const dayNum = dayOffset + 1; // 1-indexed
+  if (dayNum % 7 === 0 && !state.progress.weekly_review_shown) {
+    state.progress.weekly_review_shown = dayNum;
+    saveState();
+    setTimeout(() => showWeeklyReview(dayOffset), 600);
+  }
+  // Reset weekly review marker on new week
+  if (dayNum % 7 !== 0 && state.progress.weekly_review_shown === dayNum - 1) {
+    delete state.progress.weekly_review_shown;
+    saveState();
+  }
 
   // Check 甲子 completion
   const jiaziCompleted = checkJiaziCompletion(state, dayOffset);
@@ -909,6 +1086,64 @@ function showCompletion() {
 
   // Update daily pillar completions
   incrementDaily('pillar_completions');
+}
+
+/* ============================================================
+   Weekly Review
+   ============================================================ */
+
+let weeklyReviewModal = null;
+
+function showWeeklyReview(todayOffset) {
+  if (!HSK_DATA) return;
+  
+  weeklyReviewModal = document.getElementById('weekly-review-modal');
+  if (!weeklyReviewModal) return;
+  
+  const weekNum = Math.floor((todayOffset) / 7) + 1;
+  document.getElementById('week-label').textContent = `Week ${weekNum}`;
+  
+  // Get the past 7 days' words (including today)
+  const startIdx = Math.max(0, todayOffset - 6);
+  const weekWords = [];
+  for (let i = startIdx; i <= todayOffset; i++) {
+    const word = HSK_DATA.words[i];
+    if (word) weekWords.push(word);
+  }
+  
+  // Auto-enroll all week words in SRS (if not already)
+  ensureEnrolled(weekWords);
+  
+  const container = document.getElementById('weekly-review-words');
+  container.innerHTML = weekWords.map(w => `
+    <div class="week-word" data-day-offset="${startIdx + weekWords.indexOf(w)}">
+      <span class="ww-char" lang="zh-CN">${escHtml(w.word)}</span>
+      <span class="ww-pinyin">${escHtml(w.pinyin_text || '')}</span>
+      <span class="ww-english">${escHtml(w.english || '')}</span>
+    </div>
+  `).join('');
+  
+  // Click to jump to that day
+  container.querySelectorAll('.week-word').forEach(el => {
+    el.addEventListener('click', () => {
+      const offset = parseInt(el.dataset.dayOffset);
+      if (!isNaN(offset)) {
+        weeklyReviewModal.hidden = true;
+        loadDay(offset);
+      }
+    });
+  });
+  
+  weeklyReviewModal.hidden = false;
+  
+  document.getElementById('btn-weekly-done').onclick = () => {
+    weeklyReviewModal.hidden = true;
+  };
+  
+  // Batch-review in SRS — mark all as seen this week
+  for (const w of weekWords) {
+    recordResult(w.id, 4); // Mark as "known" to build SRS
+  }
 }
 
 /* ============================================================
@@ -1075,6 +1310,92 @@ function showOnboarding() {
     c.btn.onclick = null;
     location.reload();
   };
+}
+
+/* ============================================================
+   Share Card as Image
+   ============================================================ */
+
+async function shareCard() {
+  if (!currentWord) return;
+  
+  const card = document.querySelector('.card');
+  if (!card) return;
+  
+  if (typeof html2canvas === 'undefined') {
+    showToast('html2canvas 未加载', 'html2canvas not loaded');
+    return;
+  }
+  
+  try {
+    dom.btnShare.disabled = true;
+    dom.btnShare.textContent = '…';
+    
+    // Temporarily hide interactive elements that shouldn't appear in the image
+    const favBtn = dom.favBtn;
+    const shareBtn = dom.btnShare;
+    const nav = document.querySelector('.card-nav');
+    const phaseActions = document.querySelector('.phase-actions');
+    const pillarTabs = document.getElementById('pillar-tabs');
+    
+    if (favBtn) favBtn.style.opacity = '0';
+    if (shareBtn) shareBtn.style.opacity = '0';
+    if (nav) nav.style.display = 'none';
+    if (phaseActions) phaseActions.style.display = 'none';
+    if (pillarTabs) pillarTabs.style.opacity = '0';
+    
+    const canvas = await html2canvas(card, {
+      backgroundColor: '#121422',
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      logging: false
+    });
+    
+    // Restore visibility
+    if (favBtn) favBtn.style.opacity = '';
+    if (shareBtn) shareBtn.style.opacity = '';
+    if (nav) nav.style.display = '';
+    if (phaseActions) phaseActions.style.display = '';
+    if (pillarTabs) pillarTabs.style.opacity = '';
+    
+    // Download as PNG
+    const link = document.createElement('a');
+    link.download = `每日字-${currentWord.word}-${getLocalDate()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    
+    showToast('卡片已保存', 'Card saved as PNG');
+  } catch (err) {
+    console.error('Share card failed:', err);
+    showToast('分享失败', 'Export failed');
+  } finally {
+    dom.btnShare.disabled = false;
+    dom.btnShare.textContent = '↗';
+  }
+}
+
+/* ============================================================
+   Toast Notifications
+   ============================================================ */
+
+let toastTimer = null;
+function showToast(zhMsg, enMsg) {
+  // Remove existing toast
+  const existing = document.getElementById('toast-notification');
+  if (existing) existing.remove();
+  if (toastTimer) clearTimeout(toastTimer);
+  
+  const toast = document.createElement('div');
+  toast.id = 'toast-notification';
+  toast.innerHTML = `<span class="toast-zh">${escHtml(zhMsg)}</span> <span class="toast-en">${escHtml(enMsg)}</span>`;
+  document.getElementById('app').appendChild(toast);
+  
+  toastTimer = setTimeout(() => {
+    toast.classList.add('toast-hide');
+    setTimeout(() => toast.remove(), 300);
+    toastTimer = null;
+  }, 2500);
 }
 
 /* ============================================================
@@ -1341,6 +1662,361 @@ function renderFavorites() {
       updateFavButton();
     });
   });
+}
+
+/* ============================================================
+   Tone Contour Practice (Microphone)
+   ============================================================ */
+
+/* Expected tone contours (五度标记法 — normalized 0-1 for SVG) */
+const TONE_CONTOURS = {
+  1: [{x: 0, y: 0.15}, {x: 1, y: 0.12}],         // High level 5→5
+  2: [{x: 0, y: 0.45}, {x: 1, y: 0.10}],         // Rising 3→5
+  3: [{x: 0, y: 0.55}, {x: 0.4, y: 0.85}, {x: 1, y: 0.35}],  // Falling-rising 2→1→4
+  4: [{x: 0, y: 0.10}, {x: 1, y: 0.85}],         // Falling 5→1
+  0: [{x: 0, y: 0.50}, {x: 0.6, y: 0.50}, {x: 1, y: 0.60}]   // Neutral (mid, slight dip)
+};
+
+let toneAudioCtx = null;
+let toneAnalyser = null;
+let toneDataArray = null;
+let toneSource = null;
+let toneStream = null;
+let toneAnimFrame = null;
+let toneUserPath = [];
+let toneIsRecording = false;
+let toneTargetChar = '';
+let toneTargetPinyin = '';
+let toneTargetTones = [];
+let toneCharIdx = 0;
+let toneChars = [];
+
+function openTonePractice() {
+  if (!currentWord) return;
+  
+  const modal = document.getElementById('tone-modal');
+  if (!modal) return;
+  
+  // Extract characters and their tones from current word
+  const word = currentWord.word;
+  toneChars = [...word];
+  toneCharIdx = 0;
+  toneTargetPinyin = currentWord.pinyin_text || '';
+  
+  // Try to find tones per character
+  const parts = currentWord.pinyin_parts || [];
+  const tones = currentWord.pinyin_tones || [];
+  toneTargetTones = tones;
+  
+  modal.hidden = false;
+  
+  loadToneChar();
+  drawToneTarget();
+  resetToneUserPath();
+  
+  document.getElementById('tone-result').hidden = true;
+  
+  // Wire close
+  modal.querySelector('.btn-close-modal').onclick = () => {
+    stopToneRecording();
+    modal.hidden = true;
+  };
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      stopToneRecording();
+      modal.hidden = true;
+    }
+  });
+}
+
+function loadToneChar() {
+  const ch = toneChars[toneCharIdx];
+  document.getElementById('tone-word-char').textContent = ch || '';
+  
+  // Show pinyin for this character (if we have per-syllable data)
+  const parts = currentWord.pinyin_parts || [];
+  const pinyin = parts[toneCharIdx] || '';
+  document.getElementById('tone-word-pinyin').textContent = pinyin;
+  
+  // Update header char display
+  document.getElementById('tone-char-display').textContent = `${toneCharIdx + 1}/${toneChars.length}`;
+  
+  // Draw target contour for this character's tone
+  drawToneTarget();
+  resetToneUserPath();
+  
+  // Update next button
+  const nextBtn = document.getElementById('btn-tone-next');
+  nextBtn.textContent = toneCharIdx < toneChars.length - 1 ? '下一字 →' : '✓ 完成';
+}
+
+function drawToneTarget() {
+  const tones = currentWord.pinyin_tones || [];
+  const toneNum = tones[toneCharIdx] !== undefined ? tones[toneCharIdx] : 1;
+  const contour = TONE_CONTOURS[toneNum] || TONE_CONTOURS[1];
+  
+  const svgW = 300, svgH = 160;
+  const pad = 30;
+  const drawW = svgW - pad * 2;
+  const drawH = svgH - pad * 2;
+  
+  const d = contour.map((pt, i) => {
+    const x = pad + pt.x * drawW;
+    const y = pad + pt.y * drawH;
+    return (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1);
+  }).join(' ');
+  
+  // Color by tone
+  const toneColors = ['#5a7898', '#c8c8d0', '#5fb388', '#c9a96e', '#d4654d'];
+  const color = toneColors[toneNum] || toneColors[1];
+  
+  const targetPath = document.getElementById('tone-target');
+  targetPath.setAttribute('d', d);
+  targetPath.setAttribute('stroke', color);
+  
+  // Update tone label
+  const toneLabels = ['轻声', '一声', '二声', '三声', '四声'];
+  const label = document.querySelector('.tone-word-pinyin');
+  if (label) {
+    const toneLabel = toneLabels[toneNum] || '';
+    label.title = toneLabel;
+  }
+}
+
+function resetToneUserPath() {
+  toneUserPath = [];
+  const userPath = document.getElementById('tone-user');
+  userPath.setAttribute('d', '');
+  document.getElementById('tone-result').hidden = true;
+}
+
+function drawToneUserPath() {
+  if (toneUserPath.length < 3) return;
+  
+  const svgW = 300, svgH = 160;
+  const pad = 30;
+  const drawW = svgW - pad * 2;
+  const drawH = svgH - pad * 2;
+  
+  // Normalize to fit
+  const minFreq = Math.min(...toneUserPath.map(p => p.freq));
+  const maxFreq = Math.max(...toneUserPath.map(p => p.freq));
+  const range = Math.max(maxFreq - minFreq, 50);
+  
+  const d = toneUserPath.map((pt, i) => {
+    const x = pad + (i / (toneUserPath.length - 1)) * drawW;
+    const normY = 1 - ((pt.freq - minFreq) / range * 0.8 + 0.1);
+    const y = pad + Math.max(0, Math.min(1, normY)) * drawH;
+    return (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1);
+  }).join(' ');
+  
+  const userPath = document.getElementById('tone-user');
+  userPath.setAttribute('d', d);
+  
+  // Color based on comparison with target
+  // Green if close, gold if somewhat close, red if far
+  if (toneUserPath.length > 20) {
+    const tones = currentWord.pinyin_tones || [];
+    const targetTone = tones[toneCharIdx] !== undefined ? tones[toneCharIdx] : 1;
+    const contour = TONE_CONTOURS[targetTone] || TONE_CONTOURS[1];
+    const targetEnd = contour[contour.length - 1];
+    const userEnd = { y: 1 - ((toneUserPath[toneUserPath.length-1].freq - minFreq) / range * 0.8 + 0.1) };
+    const diff = Math.abs(userEnd.y - targetEnd.y);
+    
+    let color;
+    if (diff < 0.15) color = '#50fa7b'; // correct — green
+    else if (diff < 0.3) color = '#d4a93b'; // close — gold
+    else color = '#ff5555'; // far — red
+    userPath.setAttribute('stroke', color);
+  } else {
+    userPath.setAttribute('stroke', '#5a7898');
+  }
+}
+
+/* Pitch detection via autocorrelation */
+function startToneRecording() {
+  if (toneIsRecording) return;
+  
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showToast('麦克风不可用', 'Microphone unavailable');
+    return;
+  }
+  
+  document.getElementById('btn-tone-start').disabled = true;
+  document.getElementById('btn-tone-stop').disabled = false;
+  resetToneUserPath();
+  toneUserPath = [];
+  
+  navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } })
+    .then(stream => {
+      toneStream = stream;
+      toneAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      toneSource = toneAudioCtx.createMediaStreamSource(stream);
+      toneAnalyser = toneAudioCtx.createAnalyser();
+      toneAnalyser.fftSize = 2048;
+      toneSource.connect(toneAnalyser);
+      toneDataArray = new Float32Array(toneAnalyser.fftSize);
+      toneIsRecording = true;
+      
+      document.getElementById('tone-result').hidden = true;
+      
+      toneRecordingLoop();
+    })
+    .catch(err => {
+      console.error('Microphone error:', err);
+      showToast('麦克风权限被拒', 'Microphone permission denied');
+      document.getElementById('btn-tone-start').disabled = false;
+      document.getElementById('btn-tone-stop').disabled = true;
+    });
+}
+
+function toneRecordingLoop() {
+  if (!toneIsRecording || !toneAnalyser) return;
+  
+  toneAnalyser.getFloatTimeDomainData(toneDataArray);
+  
+  // Detect pitch via autocorrelation
+  const pitch = detectPitch(toneDataArray, toneAudioCtx.sampleRate);
+  if (pitch > 80 && pitch < 400) {
+    // Human vocal range
+    toneUserPath.push({ freq: pitch, time: Date.now() });
+    
+    // Keep last 60 samples (~1.5s at 44.1kHz)
+    if (toneUserPath.length > 60) {
+      toneUserPath = toneUserPath.slice(-60);
+    }
+    
+    drawToneUserPath();
+  }
+  
+  toneAnimFrame = requestAnimationFrame(toneRecordingLoop);
+}
+
+function detectPitch(data, sampleRate) {
+  // Autocorrelation-based pitch detection
+  const len = data.length;
+  const minPeriod = Math.floor(sampleRate / 400); // ~110 samples
+  const maxPeriod = Math.floor(sampleRate / 80);  // ~551 samples
+  
+  let bestPeriod = 0;
+  let bestCorrelation = 0;
+  
+  for (let period = minPeriod; period <= maxPeriod; period++) {
+    let correlation = 0;
+    for (let i = 0; i < len - period; i++) {
+      correlation += data[i] * data[i + period];
+    }
+    correlation /= (len - period);
+    
+    if (correlation > bestCorrelation) {
+      bestCorrelation = correlation;
+      bestPeriod = period;
+    }
+  }
+  
+  // Threshold to avoid noise
+  if (bestCorrelation < 0.1) return 0;
+  
+  // Parabolic interpolation for better accuracy
+  if (bestPeriod > minPeriod && bestPeriod < maxPeriod) {
+    const prevCorr = autocorrelationAt(data, bestPeriod - 1, sampleRate);
+    const nextCorr = autocorrelationAt(data, bestPeriod + 1, sampleRate);
+    if (prevCorr + nextCorr > 0) {
+      const a = (prevCorr + nextCorr - 2 * bestCorrelation) / 2;
+      const b = (nextCorr - prevCorr) / 2;
+      if (a !== 0) {
+        bestPeriod = bestPeriod - b / (2 * a);
+      }
+    }
+  }
+  
+  return sampleRate / bestPeriod;
+}
+
+function autocorrelationAt(data, lag) {
+  let correlation = 0;
+  for (let i = 0; i < data.length - lag; i++) {
+    correlation += data[i] * data[i + lag];
+  }
+  return correlation / (data.length - lag);
+}
+
+function stopToneRecording() {
+  toneIsRecording = false;
+  if (toneAnimFrame) {
+    cancelAnimationFrame(toneAnimFrame);
+    toneAnimFrame = null;
+  }
+  if (toneStream) {
+    toneStream.getTracks().forEach(t => t.stop());
+    toneStream = null;
+  }
+  if (toneAudioCtx) {
+    toneAudioCtx.close().catch(() => {});
+    toneAudioCtx = null;
+  }
+  toneAnalyser = null;
+  toneSource = null;
+  toneDataArray = null;
+  
+  document.getElementById('btn-tone-start').disabled = false;
+  document.getElementById('btn-tone-stop').disabled = true;
+  
+  // Show result
+  showToneResult();
+}
+
+function showToneResult() {
+  const resultEl = document.getElementById('tone-result');
+  resultEl.hidden = false;
+  
+  if (toneUserPath.length < 10) {
+    resultEl.textContent = '没有检测到足够的声音 · Not enough audio detected';
+    resultEl.className = 'tone-result neutral';
+    return;
+  }
+  
+  // Simple scoring: compare start-to-end direction vs expected
+  const tones = currentWord.pinyin_tones || [];
+  const targetTone = tones[toneCharIdx] !== undefined ? tones[toneCharIdx] : 1;
+  
+  const freqs = toneUserPath.map(p => p.freq);
+  const firstHalf = freqs.slice(0, Math.floor(freqs.length / 2));
+  const secondHalf = freqs.slice(Math.floor(freqs.length / 2));
+  
+  const avgFirst = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
+  const avgSecond = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
+  const direction = avgSecond - avgFirst;
+  
+  const toneLabels = ['轻声', '一声 (high level)', '二声 (rising)', '三声 (falling-rising)', '四声 (falling)'];
+  
+  let feedback;
+  if (targetTone === 1 && Math.abs(direction) < 15) {
+    feedback = '✓ 好！一声保持平稳 · Good steady high tone!';
+  } else if (targetTone === 2 && direction > 15) {
+    feedback = '✓ 好！二声上升 · Good rising tone!';
+  } else if (targetTone === 3 && direction > -25 && direction < 25) {
+    feedback = '✓ 好！三声先降后升 · Good dipping tone!';
+  } else if (targetTone === 4 && direction < -15) {
+    feedback = '✓ 好！四声下降 · Good falling tone!';
+  } else {
+    const expected = toneLabels[targetTone] || 'tone';
+    feedback = `继续练习 · Keep practicing! 目标：${expected}`;
+  }
+  
+  resultEl.textContent = feedback;
+  resultEl.className = feedback.startsWith('✓') ? 'tone-result good' : 'tone-result keep-practicing';
+}
+
+function nextToneChar() {
+  if (toneCharIdx < toneChars.length - 1) {
+    toneCharIdx++;
+    loadToneChar();
+  } else {
+    // Done — close modal
+    stopToneRecording();
+    document.getElementById('tone-modal').hidden = true;
+  }
 }
 
 /* ============================================================
@@ -1655,6 +2331,9 @@ function onKeyDown(e) {
     case 'Enter':
       if (currentPhase === 'shi') { e.preventDefault(); onShiContinue(); }
       break;
+    case 't':
+      if (currentPhase === 'shi' && currentWord) { e.preventDefault(); openTonePractice(); }
+      break;
     case '/':
       if (!dom.searchModal.hidden) break;
       e.preventDefault(); openSearch();
@@ -1664,6 +2343,16 @@ function onKeyDown(e) {
       else if (!dom.favoritesModal.hidden) closeFavorites();
       else if (!dom.settingsModal.hidden) closeSettings();
       else if (!dom.celebrationOverlay.hidden) dom.celebrationOverlay.hidden = true;
+      else {
+        // Close any other open modals
+        const toneModal = document.getElementById('tone-modal');
+        if (toneModal && !toneModal.hidden) {
+          stopToneRecording();
+          toneModal.hidden = true;
+        }
+        const weeklyModal = document.getElementById('weekly-review-modal');
+        if (weeklyModal && !weeklyModal.hidden) weeklyModal.hidden = true;
+      }
       break;
     case 'a':
       if (currentPhase === 'xie') { e.preventDefault(); onAnimate(); }
@@ -1728,10 +2417,12 @@ function wireEvents() {
   // Writing phase buttons
   dom.btnAnimate.addEventListener('click', onAnimate);
   dom.btnTrace.addEventListener('click', onQuiz);
+  dom.btnToneHeader.addEventListener('click', openTonePractice);
   dom.btnQuizHeader.addEventListener('click', openQuiz);
   dom.btnShow.addEventListener('click', onShowChar);
   dom.btnCharPrev.addEventListener('click', onCharPrev);
   dom.btnCharNext.addEventListener('click', onCharNext);
+  dom.btnPrintSheet.addEventListener('click', openPrintSheet);
   dom.btnXieContinue.addEventListener('click', onXieContinue);
   dom.btnXieSkip.addEventListener('click', onXieSkip);
 
@@ -1751,6 +2442,9 @@ function wireEvents() {
   dom.btnPlaySentence.addEventListener('click', () => {
     if (currentWord) playWordAudio(currentWord.id, 'sentence');
   });
+
+  // Share card
+  dom.btnShare.addEventListener('click', shareCard);
 
   // Favorites
   dom.favBtn.addEventListener('click', toggleFavorite);
@@ -1795,10 +2489,33 @@ function wireEvents() {
   dom.btnRestore.addEventListener('click', onRestore);
   dom.btnSyncUrl.addEventListener('click', onSyncUrl);
 
+  // PWA install
+  const installBtn = document.getElementById('btn-install-pwa');
+  if (installBtn) {
+    installBtn.addEventListener('click', () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          deferredPrompt = null;
+          installBtn.hidden = true;
+        });
+      }
+    });
+  }
+
+  // 甲子 report sheet
+  document.getElementById('btn-jiazi-sheet')?.addEventListener('click', openJiaziSheet);
+
   // Celebration
   dom.celebrationContinue.addEventListener('click', () => {
     dom.celebrationOverlay.hidden = true;
   });
+
+  // Tone practice
+  const toneModal = document.getElementById('tone-modal');
+  document.getElementById('btn-tone-start')?.addEventListener('click', startToneRecording);
+  document.getElementById('btn-tone-stop')?.addEventListener('click', stopToneRecording);
+  document.getElementById('btn-tone-next')?.addEventListener('click', nextToneChar);
 
   // Quiz modal
   dom.quizModal.querySelector('.btn-close-modal').addEventListener('click', closeQuiz);
@@ -1806,6 +2523,20 @@ function wireEvents() {
   dom.quizNext.addEventListener('click', nextQuizQuestion);
   dom.quizDone.addEventListener('click', () => { quizIdx = quizWords.length; showQuizQuestion(); });
   dom.quizClose.addEventListener('click', closeQuiz);
+
+  // PWA install prompt
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const installBtn = document.getElementById('btn-install-pwa');
+    if (installBtn) installBtn.hidden = false;
+  });
+  window.addEventListener('appinstalled', () => {
+    deferredPrompt = null;
+    const installBtn = document.getElementById('btn-install-pwa');
+    if (installBtn) installBtn.hidden = true;
+  });
 
   // Keyboard
   document.addEventListener('keydown', onKeyDown);
