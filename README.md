@@ -2,7 +2,7 @@
 
 > *A word a day, like a daily vitamin for your Chinese.*
 
-**[Live Demo](https://PimplesOnNose.github.io/mei-ri-zi/)** — Try it now.
+**[Live Demo](https://pimplesonnose.github.io/mei-ri-zi/)** — Try it now.
 
 A static HSK 3.0 vocabulary learning app rooted deeply in traditional Chinese design 
 and color philosophy — where Wu Xing (五行), the Ten Heavenly Stems (十天干), 

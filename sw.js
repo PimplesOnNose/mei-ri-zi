@@ -6,17 +6,18 @@ const CACHE = 'mei-ri-zi-v1';
 const STATIC_CACHE = 'mei-ri-zi-static-v1';
 
 /* Assets to pre-cache on install — the app shell */
+// Use relative paths so they work on both root and subpath deployments
 const PRECACHE = [
-  '/',
-  '/index.html',
-  '/css/app.css',
-  '/js/app.js',
-  '/js/progress.js',
-  '/js/srs.js',
-  '/js/celebrations.js',
-  '/manifest.json',
-  '/icon-192.svg',
-  '/icon-512.svg',
+  './',
+  './index.html',
+  './css/app.css',
+  './js/app.js',
+  './js/progress.js',
+  './js/srs.js',
+  './js/celebrations.js',
+  './manifest.json',
+  './icon-192.svg',
+  './icon-512.svg',
 ];
 
 /* CDN resources to cache */
