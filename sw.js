@@ -2,8 +2,8 @@
    Service Worker — 每日字 Offline Support
    ============================================================ */
 
-const CACHE = 'mei-ri-zi-v1';
-const STATIC_CACHE = 'mei-ri-zi-static-v1';
+const CACHE = 'mei-ri-zi-v2';
+const STATIC_CACHE = 'mei-ri-zi-static-v2';
 
 /* Assets to pre-cache on install — the app shell */
 // Use relative paths so they work on both root and subpath deployments
@@ -21,7 +21,7 @@ const PRECACHE = [
 ];
 
 /* CDN resources to cache */
-const CDN_CACHE = 'mei-ri-zi-cdn-v1';
+const CDN_CACHE = 'mei-ri-zi-cdn-v2';
 const CDN_RESOURCES = [
   'https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js',
   'https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js',
