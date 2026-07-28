@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日字 · Měi Rì Zì</title>
+<meta name="description" content="A word a day, like a daily vitamin for your Chinese. HSK 3.0 vocabulary learning with tone-colored pinyin, hanzi-writer, and SRS review.">
+<meta property="og:title" content="每日字 · Měi Rì Zì">
+<meta property="og:description" content="A word a day, like a daily vitamin for your Chinese. HSK 3.0 vocabulary learning rooted in Wu Xing design philosophy.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="icon-512.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="每日字 · Měi Rì Zì">
+<meta name="twitter:description" content="A word a day, like a daily vitamin for your Chinese.">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="每日字">
+<meta name="theme-color" content="#0a0a14">
+<!-- Preload critical font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Hanzi-writer CDN -->
+<script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
+<!-- pako for sync URL compression -->
+<script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+<link rel="stylesheet" href="css/app.css?v=1.7">
+</head>
+<body>
+<!-- Loading overlay -->
+<div id="loading-screen" class="loading-screen">
+  <div class="loading-content">
+    <div class="loading-char">字</div>
+    <div class="loading-bar"><div class="loading-fill"></div></div>
+    <div class="loading-text">每日字 · loading</div>
+  </div>
+</div>
+
+<div id="app" hidden>
+  <!-- Skip to content (accessibility) -->
+  <a href="#main-content" class="skip-link">跳至内容 · Skip to content</a>
+
+  <!-- ===== Header ===== -->
+  <header class="app-header">
+    <div class="header-left">
+      <span class="logo">每日字</span>
+      <span class="logo-sep">·</span>
+      <span class="logo-en">Měi Rì Zì</span>
+    </div>
+    <div class="header-center">
+      <span class="stem-badge" id="stem-badge">—</span>
+      <span class="catchup-badge" id="catchup-badge" hidden>补</span>
+      <span class="solar-term" id="solar-term">—</span>
+    </div>
+    <div class="header-right">
+      <button class="btn-icon btn-search" id="btn-search" aria-label="搜索 Search" title="搜索 /">⌕</button>
+      <button class="btn-icon btn-quiz" id="btn-quiz-header" aria-label="测验 Quiz" title="测验 ?">?</button>
+      <button class="btn-icon btn-favorites" id="btn-favorites" aria-label="收藏 Saved words" title="收藏 ☆">☆</button>
+      <button class="btn-icon btn-settings" id="btn-settings" aria-label="设置 Settings" title="设置 ⚙">⚙</button>
+    </div>
+  </header>
+
+  <!-- ===== Missed-Day Notice ===== -->
+  <div class="missed-notice" id="missed-notice" hidden>
+    <p class="missed-text">你没有打开每日字 <strong id="missed-count">0</strong> 天</p>
+    <div class="missed-actions">
+      <button class="btn btn-catch-up" id="btn-catch-up">补上 Make up</button>
+      <button class="btn btn-skip-ahead" id="btn-skip-ahead">跳过 Jump to today</button>
+    </div>
+  </div>
+
+  <!-- ===== Main Content ===== -->
+  <main id="main-content">
+
+    <!-- ===== Pillar Tabs ===== -->
+    <nav class="pillar-tabs" id="pillar-tabs">
+      <button class="pillar-tab active" data-pillar="shi">
+        <span class="pillar-char">识</span>
+        <span class="pillar-label">Card</span>
+      </button>
+      <button class="pillar-tab" data-pillar="xie">
+        <span class="pillar-char">写</span>
+        <span class="pillar-label">Write</span>
+      </button>
+      <button class="pillar-tab" data-pillar="xi">
+        <span class="pillar-char">习</span>
+        <span class="pillar-label">Review</span>
+      </button>
+    </nav>
+
+    <!-- ===== Phase Containers ===== -->
+
+    <!-- 识 Card Phase -->
+    <section class="phase" id="phase-shi">
+      <div class="card card-accent" id="daily-card">
+        <header class="card-header">
+          <span class="day-label" id="day-label">—</span>
+          <button class="fav-btn" id="fav-btn" aria-label="Save word">☆</button>
+        </header>
+        <div class="card-body" id="card-body">
+          <!-- word character -->
+          <div class="word-char" id="word-char" lang="zh-CN">—</div>
+          <!-- tone-colored pinyin -->
+          <div class="word-pinyin" id="word-pinyin"></div>
+          <!-- pos + english -->
+          <div class="word-meta" id="word-meta"></div>
+
+          <!-- example sentence (collapsible) -->
+          <details class="section-collapsible example-section" id="example-section">
+            <summary class="section-summary">例句 Example</summary>
+            <div class="section-body">
+              <div class="example-zh" id="example-zh" lang="zh-CN"></div>
+              <div class="example-pinyin" id="example-pinyin"></div>
+              <div class="example-en" id="example-en"></div>
+              <button class="btn-play btn-play-sentence" id="btn-play-sentence" aria-label="Play example sentence">▶ 听句</button>
+              <span class="audio-unavailable" id="sentence-audio-unavailable" hidden>音频未生成</span>
+            </div>
+          </details>
+
+          <!-- glyph breakdown (collapsible) -->
+          <details class="section-collapsible glyph-section" id="glyph-section">
+            <summary class="section-summary">字形 Glyph</summary>
+            <div class="section-body">
+              <div class="glyph-breakdown" id="glyph-breakdown"></div>
+            </div>
+          </details>
+
+          <!-- audio -->
+          <div class="audio-section">
+            <button class="btn-play" id="btn-play-word" aria-label="Play pronunciation">▶ 听</button>
+            <span class="audio-unavailable" id="audio-unavailable" hidden>音频未生成</span>
+          </div>
+        </div>
+        <footer class="card-nav">
+          <button class="btn-nav" id="nav-prev">← 上一日</button>
+          <button class="btn-nav btn-today" id="nav-today">今日</button>
+          <button class="btn-nav" id="nav-next">下一日 →</button>
+        </footer>
+      </div>
+
+      <!-- Continue to 写 -->
+      <div class="phase-actions">
+        <button class="btn btn-primary" id="btn-shi-continue">写 → Continue</button>
+        <button class="btn btn-skip" id="btn-shi-skip">Skip →</button>
+      </div>
+    </section>
+
+    <!-- 写 Writing Phase -->
+    <section class="phase" id="phase-xie" hidden>
+      <div class="writing-section">
+        <div class="writing-header">
+          <span class="writing-label">写 · Writing</span>
+          <span class="writing-char-label" id="writing-char-label"></span>
+          <div class="writing-modes">
+            <button class="btn-mode" id="btn-animate" title="Animate">▶ Animate</button>
+            <button class="btn-mode" id="btn-quiz" title="Trace">✍ Write</button>
+            <button class="btn-mode" id="btn-show" title="Reveal">👁 Reveal</button>
+          </div>
+        </div>
+        <div class="writing-canvas-wrapper" id="writing-canvas-wrapper">
+          <!-- hanzi-writer renders here -->
+        </div>
+        <div class="writing-progress" id="writing-progress"></div>
+        <div class="writing-result" id="writing-result" hidden></div>
+        <div class="writing-nav">
+          <button class="btn btn-char-prev" id="btn-char-prev" disabled>← 上一字</button>
+          <button class="btn btn-char-next" id="btn-char-next">下一字 →</button>
+        </div>
+      </div>
+      <div class="phase-actions">
+        <button class="btn btn-primary" id="btn-xie-continue">习 → Review</button>
+        <button class="btn btn-skip" id="btn-xie-skip">Skip →</button>
+      </div>
+    </section>
+
+    <!-- 习 Review Phase -->
+    <section class="phase" id="phase-xi" hidden>
+      <div class="review-section" id="review-section">
+        <div class="review-empty" id="review-empty" hidden>
+          <p>今日无复习</p>
+          <p class="review-empty-sub">No reviews due today</p>
+        </div>
+        <div class="review-cards" id="review-cards"></div>
+      </div>
+      <div class="phase-actions">
+        <button class="btn btn-primary" id="btn-xi-done">✓ 完成 Done</button>
+        <button class="btn btn-skip" id="btn-xi-skip">Skip →</button>
+      </div>
+    </section>
+
+    <!-- Completion Stamp -->
+    <section class="phase" id="phase-complete" hidden>
+      <div class="completion-stamp">
+        <div class="stamp-icon">✓</div>
+        <div class="stamp-text">今日完成</div>
+        <div class="stamp-streak" id="stamp-streak">连续 0 天</div>
+        <div class="stamp-stem" id="stamp-stem">甲子 cycle: 0/60</div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== Five-Colored Earth Altar (persistent footer) ===== -->
+  <footer class="altar-bar" id="altar-bar">
+    <div class="altar-tier" data-tier="wood">
+      <span class="altar-tier-label">木</span>
+      <div class="altar-fill-wrap">
+        <div class="altar-fill" id="altar-wood-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="altar-tier" data-tier="fire">
+      <span class="altar-tier-label">火</span>
+      <div class="altar-fill-wrap">
+        <div class="altar-fill" id="altar-fire-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="altar-tier" data-tier="earth">
+      <span class="altar-tier-label">土</span>
+      <div class="altar-fill-wrap">
+        <div class="altar-fill" id="altar-earth-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="altar-tier" data-tier="metal">
+      <span class="altar-tier-label">金</span>
+      <div class="altar-fill-wrap">
+        <div class="altar-fill" id="altar-metal-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="altar-tier" data-tier="water">
+      <span class="altar-tier-label">水</span>
+      <div class="altar-fill-wrap">
+        <div class="altar-fill" id="altar-water-fill" style="width:0%"></div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== Modals ===== -->
+
+  <!-- Search Modal -->
+  <div class="modal-overlay" id="search-modal" hidden>
+    <div class="modal modal-search">
+      <div class="modal-header">
+        <h2>搜索 Search</h2>
+        <button class="btn-close-modal" aria-label="Close search">✕</button>
+      </div>
+      <input type="text" class="search-input" id="search-input" placeholder="搜索汉字、拼音或英文…" autocomplete="off" spellcheck="false">
+      <div class="search-filters" id="search-filters">
+        <button class="filter-btn active" data-level="all">All</button>
+      </div>
+      <div class="search-results" id="search-results"></div>
+    </div>
+  </div>
+
+  <!-- Quiz Modal -->
+  <div class="modal-overlay" id="quiz-modal" hidden>
+    <div class="modal modal-quiz">
+      <div class="modal-header">
+        <h2>测验 Quiz</h2>
+        <div class="quiz-stats" id="quiz-stats">0/0</div>
+        <button class="btn-close-modal" aria-label="Close quiz">✕</button>
+      </div>
+      <div class="quiz-body" id="quiz-body">
+        <div class="quiz-question" id="quiz-question"></div>
+        <div class="quiz-options" id="quiz-options"></div>
+        <div class="quiz-result" id="quiz-result" hidden></div>
+      </div>
+      <div class="quiz-footer">
+        <button class="btn btn-primary" id="quiz-next" hidden>下一题 Next →</button>
+        <button class="btn" id="quiz-done" hidden>✓ 完成 Done</button>
+      </div>
+      <div class="quiz-summary" id="quiz-summary" hidden>
+        <div class="quiz-score" id="quiz-score"></div>
+        <div class="quiz-results-list" id="quiz-results-list"></div>
+        <button class="btn btn-primary" id="quiz-close">关闭 Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Favorites Modal -->
+  <div class="modal-overlay" id="favorites-modal" hidden>
+    <div class="modal modal-favorites">
+      <div class="modal-header">
+        <h2>收藏 Saved Words</h2>
+        <button class="btn-close-modal" aria-label="Close favorites">✕</button>
+      </div>
+      <div class="favorites-list" id="favorites-list"></div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settings-modal" hidden>
+    <div class="modal modal-settings">
+      <div class="modal-header">
+        <h2>设置 Settings</h2>
+        <button class="btn-close-modal" aria-label="Close settings">✕</button>
+      </div>
+      <div class="settings-body">
+        <label class="setting-row">
+          <span>声调颜色 Tone Colors</span>
+          <input type="checkbox" id="setting-tone-colors" checked>
+        </label>
+        <label class="setting-row">
+          <span>季节氛围 Seasonal Atmosphere</span>
+          <input type="checkbox" id="setting-seasonal" checked>
+        </label>
+        <label class="setting-row">
+          <span>写所有字 Write All Characters</span>
+          <input type="checkbox" id="setting-write-all" checked>
+        </label>
+        <label class="setting-row">
+          <span>音频速度 Audio Speed</span>
+          <input type="range" id="setting-audio-speed" min="0.7" max="1.2" step="0.05" value="0.95">
+        </label>
+        <label class="setting-row">
+          <span>语言 Language</span>
+          <select id="setting-language">
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+          </select>
+        </label>
+        <label class="setting-row">
+          <span>起始级别 Starting Level</span>
+          <select id="setting-start-level">
+            <option value="0">HSK 1 — 木 (Beginner)</option>
+            <option value="497">HSK 2 — 木→火</option>
+            <option value="1258">HSK 3 — 火 (Fire)</option>
+            <option value="2224">HSK 4 — 火→土</option>
+            <option value="3217">HSK 5 — 土→金</option>
+            <option value="4284">HSK 6 — 金 (Metal)</option>
+            <option value="5417">HSK 7-9 — 水 (Water)</option>
+          </select>
+        </label>
+        <hr class="settings-divider">
+        <button class="btn btn-settings-action" id="btn-backup">备份 · Backup</button>
+        <button class="btn btn-settings-action" id="btn-restore">恢复 · Restore</button>
+        <button class="btn btn-settings-action" id="btn-sync-url">链接同步 · Sync URL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Celebration Overlay -->
+  <div class="celebration-overlay" id="celebration-overlay" hidden>
+    <div class="celebration-content">
+      <div class="celebration-svg" id="celebration-svg"></div>
+      <h2 class="celebration-title" id="celebration-title"></h2>
+      <p class="celebration-body" id="celebration-body"></p>
+      <button class="btn btn-primary" id="celebration-continue">继续 Continue</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/srs.js?v=1.7"></script>
+<script src="js/progress.js?v=1.7"></script>
+<script src="js/celebrations.js?v=1.7"></script>
+<script src="js/app.js?v=1.7"></script>
+<script>
+// Register service worker for offline support
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(function(err) {
+    console.log('SW registration failed (expected on plain HTTP):', err);
+  });
+}
+</script>
+</body>
+</html>

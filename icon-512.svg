@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#0a0a14" rx="64"/>
+  <text x="256" y="340" text-anchor="middle" fill="#f0e8d5" font-family="Ma Shan Zheng, Noto Serif SC, serif" font-size="256">字</text>
+  <line x1="80" y1="470" x2="432" y2="470" stroke="#d4a93b" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+  <line x1="80" y1="470" x2="256" y2="450" stroke="#4a9e8a" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+  <line x1="432" y1="470" x2="256" y2="450" stroke="#c4452d" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+</svg>

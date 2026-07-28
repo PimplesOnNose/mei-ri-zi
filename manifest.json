@@ -1,0 +1,28 @@
+{
+  "name": "每日字 · Měi Rì Zì",
+  "short_name": "每日字",
+  "description": "A word a day, like a daily vitamin for your Chinese. HSK 3.0 vocabulary learning.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a14",
+  "theme_color": "#d4a93b",
+  "orientation": "portrait",
+  "lang": "zh",
+  "dir": "ltr",
+  "categories": ["education", "language"],
+  "icons": [
+    {
+      "src": "icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": []
+}

@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "total_words": 11032,
+  "levels": {
+    "hsk1": {
+      "word_count": 497,
+      "start_offset": 0,
+      "element": "木",
+      "color": "#4a9e8a",
+      "file": "levels/hsk1.json"
+    },
+    "hsk2": {
+      "word_count": 761,
+      "start_offset": 497,
+      "element": "木→火",
+      "color": "#6db3a4",
+      "file": "levels/hsk2.json"
+    },
+    "hsk3": {
+      "word_count": 966,
+      "start_offset": 1258,
+      "element": "火",
+      "color": "#c4452d",
+      "file": "levels/hsk3.json"
+    },
+    "hsk4": {
+      "word_count": 993,
+      "start_offset": 2224,
+      "element": "火→土",
+      "color": "#c9a96e",
+      "file": "levels/hsk4.json"
+    },
+    "hsk5": {
+      "word_count": 1067,
+      "start_offset": 3217,
+      "element": "土→金",
+      "color": "#d4b878",
+      "file": "levels/hsk5.json"
+    },
+    "hsk6": {
+      "word_count": 1133,
+      "start_offset": 4284,
+      "element": "金",
+      "color": "#8faacc",
+      "file": "levels/hsk6.json"
+    },
+    "hsk79": {
+      "word_count": 5615,
+      "start_offset": 5417,
+      "element": "水",
+      "color": "#3a6e8e",
+      "file": "levels/hsk79.json"
+    }
+  },
+  "stems": [
+    "甲",
+    "乙",
+    "丙",
+    "丁",
+    "戊",
+    "己",
+    "庚",
+    "辛",
+    "壬",
+    "癸"
+  ],
+  "stem_elements": [
+    "木",
+    "木",
+    "火",
+    "火",
+    "土",
+    "土",
+    "金",
+    "金",
+    "水",
+    "水"
+  ],
+  "generated_at": "2026-07-27T00:00:00Z"
+}
