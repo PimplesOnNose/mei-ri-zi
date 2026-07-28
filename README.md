@@ -112,7 +112,7 @@ python3 scripts/generate_audio.py
 # Download and build the full HSK 3.0 vocabulary
 python3 scripts/generate_data.py
 
-# For a quick test with only HSK 1-2 enriched words:
+# For a quick test with only HSK 1-2:
 python3 scripts/generate_data.py --enriched-only
 ```
 
@@ -142,8 +142,9 @@ mei-ri-zi/
 ## Data Sources
 
 HSK 3.0 vocabulary lists sourced from [krmanik/HSK-3.0](https://github.com/krmanik/HSK-3.0) — 
-11,032 words across 9 levels. HSK 1-2 enriched with hand-curated component breakdowns 
-and example sentences.
+11,032 words across all 7 HSK levels. Every word has AI-generated example sentences 
+(DeepSeek), radical/glyph breakdowns for all characters, and Edge TTS audio (晓晓) 
+for HSK 1-6.
 
 ## License
 
