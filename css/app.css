@@ -551,26 +551,44 @@ body::before {
   width: 100%;
   text-align: left;
   margin-top: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color var(--duration-fast);
+}
+.section-collapsible[open] {
+  border-color: var(--border-strong);
+  position: relative;
+}
+.section-collapsible[open]::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 2px;
+  background: var(--theme-accent, var(--accent-gold));
+  border-radius: 2px 0 0 2px;
 }
 .section-summary {
   font-family: var(--font-ui);
   font-size: 12px;
   color: var(--fg-dim);
   cursor: pointer;
-  padding: var(--space-sm);
-  border-radius: 6px;
+  padding: var(--space-sm) var(--space-md);
   user-select: none;
-  transition: background var(--duration-fast);
+  transition: background var(--duration-fast), color var(--duration-fast);
   min-height: 44px;
   display: flex;
   align-items: center;
+  gap: var(--space-sm);
+  letter-spacing: 0.03em;
 }
-.section-summary:hover { background: var(--bg-surface); }
+.section-summary:hover { background: var(--bg-surface); color: var(--fg); }
 .section-summary:focus-visible { outline: 2px solid var(--theme-accent, var(--accent-gold)); outline-offset: 2px; }
 .section-summary::marker { color: var(--fg-soft); }
 
 .section-body {
-  padding: var(--space-sm) var(--space-sm) var(--space-md);
+  padding: var(--space-md);
+  border-top: 1px solid var(--border);
 }
 
 .example-zh {
