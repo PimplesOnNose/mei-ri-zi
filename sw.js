@@ -104,14 +104,17 @@ self.addEventListener('fetch', (event) => {
 
   // App shell — cache-first for everything else
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const fetched = fetch(event.request).then((response) => {
-        if (response && response.ok && response.type === 'basic') {
-          caches.open(STATIC_CACHE).then((cache) => cache.put(event.request, response.clone()));
-        }
-        return response;
-      }).catch(() => cached);
-      return cached || fetched;
+    caches.open(STATIC_CACHE).then((cache) => {
+      return cache.match(event.request).then((cached) => {
+        const fetched = fetch(event.request).then((response) => {
+          if (response && response.ok && response.type === 'basic') {
+            // Clone synchronously — cache is already open in this scope
+            cache.put(event.request, response.clone()).catch(() => {});
+          }
+          return response;
+        }).catch(() => cached);
+        return cached || fetched;
+      });
     })
   );
 });
