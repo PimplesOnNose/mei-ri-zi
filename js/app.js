@@ -1853,6 +1853,10 @@ function startToneRecording() {
     .then(stream => {
       toneStream = stream;
       toneAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      // iOS Safari requires explicit resume — AudioContext starts suspended
+      if (toneAudioCtx.state === 'suspended') {
+        toneAudioCtx.resume();
+      }
       toneSource = toneAudioCtx.createMediaStreamSource(stream);
       toneAnalyser = toneAudioCtx.createAnalyser();
       toneAnalyser.fftSize = 2048;
@@ -1876,6 +1880,13 @@ function toneRecordingLoop() {
   if (!toneIsRecording || !toneAnalyser) return;
   
   toneAnalyser.getFloatTimeDomainData(toneDataArray);
+  
+  // Sanity check: if AudioContext is suspended, data will be all zeros
+  if (toneAudioCtx && toneAudioCtx.state === 'suspended') {
+    toneAudioCtx.resume();
+    toneAnimFrame = requestAnimationFrame(toneRecordingLoop);
+    return;
+  }
   
   // Detect pitch via autocorrelation
   const pitch = detectPitch(toneDataArray, toneAudioCtx.sampleRate);
@@ -1916,8 +1927,8 @@ function detectPitch(data, sampleRate) {
     }
   }
   
-  // Threshold to avoid noise
-  if (bestCorrelation < 0.1) return 0;
+  // Threshold to avoid noise — use 0.03 for mobile mic sensitivity
+  if (bestCorrelation < 0.03) return 0;
   
   // Parabolic interpolation for better accuracy
   if (bestPeriod > minPeriod && bestPeriod < maxPeriod) {
