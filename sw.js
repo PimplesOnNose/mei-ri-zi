@@ -18,6 +18,8 @@ const PRECACHE = [
   './manifest.json',
   './icon-192.svg',
   './icon-512.svg',
+  './favicon.svg',
+  './favicon.ico',
 ];
 
 /* CDN resources to cache */
@@ -64,7 +66,7 @@ self.addEventListener('fetch', (event) => {
       caches.open(CDN_CACHE).then((cache) => {
         return cache.match(event.request).then((cached) => {
           const fetched = fetch(event.request).then((response) => {
-            if (response && response.ok) {
+            if (response && response.status === 200) {
               cache.put(event.request, response.clone());
             }
             return response;
@@ -82,7 +84,7 @@ self.addEventListener('fetch', (event) => {
       caches.open(CACHE).then((cache) => {
         return cache.match(event.request).then((cached) => {
           const fetched = fetch(event.request).then((response) => {
-            if (response && response.ok) {
+            if (response && response.status === 200) {
               cache.put(event.request, response.clone());
             }
             return response;
@@ -107,7 +109,7 @@ self.addEventListener('fetch', (event) => {
     caches.open(STATIC_CACHE).then((cache) => {
       return cache.match(event.request).then((cached) => {
         const fetched = fetch(event.request).then((response) => {
-          if (response && response.ok && response.type === 'basic') {
+          if (response && response.status === 200 && response.type === 'basic') {
             // Clone synchronously — cache is already open in this scope
             cache.put(event.request, response.clone()).catch(() => {});
           }
